@@ -1,2 +1,1 @@
-# expensely-web
-Expensely landing page repository.
+Expensely Web Landing Page
