@@ -7,33 +7,36 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout code
+        uses: actions/checkout@v2
 
       - name: Cache node modules
         uses: actions/cache@v2
         with:
-          path: ~/.npm
+          path: |
+            **/node_modules
+            ${{ github.workspace }}/.next/cache
           key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
           restore-keys: |
             ${{ runner.os }}-node-
 
       - name: Setup Node
-        uses: actions/setup-node@v2-beta
+        uses: actions/setup-node@v2
         with:
-          node-version: "12"
+          node-version: 14.x
 
-      - name: Build
-        run: |
-          npm install
-          npm run build -- --prod
+      - name: Install Dependencies
+        run: npm install
 
-      - name: Publish
-        uses: nwtgck/actions-netlify@v1.1
+      - name: Build project
+        run: npm run build
+
+      - name: Deploy to Netlify
+        uses: nwtgck/actions-netlify@v1.2
         with:
-          publish-dir: "./dist"
+          publish-dir: "./out"
           production-deploy: true
-          netlify-config-path: "./dist/netlify.toml"
-          deploy-message: "Expensely client deployed from GitHub Actions."
+          deploy-message: "Expensely web deployed from GitHub Actions"
         env:
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
           NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
